@@ -1,0 +1,52 @@
+import { useEffect, useRef } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Stars } from "@react-three/drei";
+import * as THREE from "three";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+
+const SpinningEarth = () => {
+  const earthRef = useRef();
+
+  useEffect(() => {
+    const animate = () => {
+      if (earthRef.current) {
+        earthRef.current.rotation.y += 0.002;
+      }
+      requestAnimationFrame(animate);
+    };
+    animate();
+  }, []);
+
+  return (
+    <mesh ref={earthRef}>
+      <sphereGeometry args={[2, 64, 64]} />
+      <meshStandardMaterial map={new THREE.TextureLoader().load("/earth_texture.jpg")} />
+    </mesh>
+  );
+};
+
+export default function HomePage() {
+  return (
+    <div className="relative h-screen w-full bg-black overflow-hidden text-white">
+      <Canvas camera={{ position: [0, 0, 5] }}>
+        <ambientLight intensity={0.3} />
+        <directionalLight position={[5, 5, 5]} intensity={1} />
+        <Stars />
+        <SpinningEarth />
+        <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
+      </Canvas>
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+        className="absolute top-1/4 left-1/2 transform -translate-x-1/2 text-center"
+      >
+        <h1 className="text-5xl font-bold">Welcome to Tilted Earth</h1>
+        <p className="text-lg mt-4">Where Gravity Meets Rebellion</p>
+        <Button className="mt-6 px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-xl shadow-lg">Explore</Button>
+      </motion.div>
+    </div>
+  );
+}
